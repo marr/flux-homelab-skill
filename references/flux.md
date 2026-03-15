@@ -43,3 +43,14 @@ apps/
 2. Add namespace, kustomization, HelmRelease.
 3. Add SOPS secret if needed.
 4. Add the app directory to the apps kustomization.
+
+## OCI chart gotchas (Flux 2.8.x)
+- Use **`source.toolkit.fluxcd.io/v1` for source objects** such as `GitRepository`, `HelmRepository`, and `OCIRepository`.
+- Use **`helm.toolkit.fluxcd.io/v2` for `HelmRelease`**.
+- Do not read this as “use v1 everywhere” — the split is **sources = v1**, **HelmRelease = v2**.
+- OCI-backed Helm charts can be wired in two different ways, and both may be valid depending on chart/repo behavior:
+  1. `HelmRepository` with `spec.type: oci`, then `HelmRelease.spec.chart.spec.sourceRef.kind: HelmRepository`
+  2. `OCIRepository`, then `HelmRelease.spec.chartRef.kind: OCIRepository`
+- If one pattern fails unexpectedly, try the other instead of assuming the chart itself is broken.
+- Keep source kind and HelmRelease reference aligned; mismatches are easy to introduce during refactors.
+- When debugging OCI issues, inspect both the source object and the HelmRelease events.
