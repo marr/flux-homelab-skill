@@ -19,6 +19,7 @@ This version is safe to share publicly. It focuses on reusable workflows and got
 - `references/flux.md`
 - `references/secrets.md`
 - `references/homepage.md`
+- `references/cluster-hygiene.md`
 
 ## Install
 Use the packaged `.skill` file from the GitHub release, or clone this repo and package it with your own tooling.
