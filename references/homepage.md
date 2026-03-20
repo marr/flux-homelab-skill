@@ -52,9 +52,11 @@ widget:
 ```yaml
 widget:
   type: traefik
-  url: http://traefik.<namespace>.svc.cluster.local:8080
+  url: https://traefik.example.com
 ```
-This usually requires enabling Traefik's internal API/dashboard for in-cluster access.
+If the HelmRelease sets `api.insecure: false` (recommended), the raw Service port `:8080` does **not** serve `/api/*` (you get 404). Point the widget at the same HTTPS host you use for the dashboard (an IngressRoute to `api@internal`), or set `api.insecure: true` only if you accept exposing the API on that port (often also on the LoadBalancer).
+
+The older pattern `http://traefik.<ns>.svc.cluster.local:8080` only works when the insecure API is enabled on that listener.
 
 ### CrowdSec
 ```yaml
@@ -64,7 +66,17 @@ widget:
   username: <machine-name>
   password: "{{HOMEPAGE_VAR_CROWDSEC_PASS}}"
 ```
-The widget expects watcher/machine auth. Bouncer keys may not work for all endpoints.
+The widget uses **LAPI machine** login (not bouncer keys). The machine **must exist** in CrowdSec with the same password as the secret, or the homepage logs show `401` / `Failed to login to Crowdsec API`.
+
+Register once (from the LAPI pod; use `-f` so `cscli` does not overwrite the pod’s own `local_api_credentials.yaml`):
+
+```bash
+PASS=$(kubectl get secret homepage-secrets -n homepage -o jsonpath='{.data.HOMEPAGE_VAR_CROWDSEC_PASS}' | base64 -d)
+kubectl exec -n crowdsec deploy/crowdsec-lapi -- env "PASS=$PASS" sh -c \
+  'cscli machines add <machine-name> -p "$PASS" -f /tmp/homepage-creds.yaml'
+```
+
+After rotating `HOMEPAGE_VAR_CROWDSEC_PASS`, either update the machine in CrowdSec (`cscli machines delete` / `add` with `--force`) or re-register with the new password.
 
 ## Theme advice
 Avoid overly dark background overlays on top of a dark theme. They can look good during first paint and then collapse to nearly black after full render.

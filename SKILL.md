@@ -11,6 +11,7 @@ Use this skill for repeatable GitOps homelab operations.
 - For Flux workflows and repo layout: `references/flux.md`
 - For SOPS secret editing patterns: `references/secrets.md`
 - For homepage widget and ConfigMap patterns: `references/homepage.md`
+- For stale Endpoints, empty Services, Flux drift: `references/cluster-hygiene.md`
 
 ## Default workflow
 
@@ -34,6 +35,7 @@ Follow `references/secrets.md`.
 Follow `references/homepage.md`.
 
 ## Key gotchas
+- Do not mix **manual v1/Endpoints** with **Git-managed EndpointSlice** for the same Service (flaky 502s if IPs drift).
 - `subPath` ConfigMap mounts do not hot-reload.
 - Homepage variable substitution requires matching `HOMEPAGE_VAR_*` secret keys.
 - Some widgets need internal API compatibility flags or version selectors.
