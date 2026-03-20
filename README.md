@@ -23,5 +23,16 @@ This version is safe to share publicly. It focuses on reusable workflows and got
 ## Install
 Use the packaged `.skill` file from the GitHub release, or clone this repo and package it with your own tooling.
 
+## Cursor / monorepo layout (optional)
+
+If this repo lives next to `fleet-infra` under a workspace root, you can expose it to Cursor’s agent skills path with a **symlink** so you only edit one tree:
+
+```bash
+# from <workspace>/.agents/skills — adjust if your layout differs
+ln -s ../../flux-homelab-skill flux-homelab
+```
+
+The symlink name `flux-homelab` should match the folder name Cursor expects under `.agents/skills/`.
+
 ## Notes
 This repository includes a README for GitHub discoverability. The packaged skill itself is distributed as a `.skill` artifact in Releases.
