@@ -1,12 +1,50 @@
 # Flux Reference
 
 ## Reconcile
+Prefer reconciling the **GitRepository** first, then kustomizations (some Flux CLI versions omit `--with-source`):
+
 ```bash
-flux reconcile kustomization flux-system --with-source
-flux reconcile kustomization infrastructure-controllers --with-source
-flux reconcile kustomization infrastructure-configs --with-source
-flux reconcile kustomization apps --with-source
+flux reconcile source git flux-system -n flux-system
+flux reconcile kustomization flux-system -n flux-system
+flux reconcile kustomization infrastructure-controllers -n flux-system
+flux reconcile kustomization infrastructure-configs -n flux-system
+flux reconcile kustomization apps -n flux-system
 ```
+
+## Stuck kustomizations and `wait: true`
+
+If a **`Kustomization`** stays **not Ready** with **health check timeout** on a **`HelmRelease`**:
+
+- **`kubectl describe kustomization <name> -n flux-system`** — look for `HealthCheckFailed` and which HelmRelease is blocking.
+- While the blocker is unhealthy, **`status.lastAppliedRevision`** may **lag** **`lastAttemptedRevision`**: Git changes (including fixes to the same `HelmRelease`) might not apply until health recovers or you **patch the live `HelmRelease`** / **delete stuck workloads** to unblock.
+- **Downstream** kustomizations with **`spec.dependsOn`** wait on upstream Ready — one bad Helm release can freeze **apps** and **configs** for the whole fleet.
+- **High `helm-controller` CPU** often correlates with a **failing Helm release** in a retry loop.
+
+## HelmRelease: `upgrade.force` and server-side apply
+
+Helm may fail with: **`invalid operation: cannot use force conflicts and force replace together`**. On **`HelmRelease`**, set server-side apply so **`upgrade.force: true`** is usable (same idea as kube-prometheus-stack in many fleets):
+
+```yaml
+spec:
+  install:
+    serverSideApply: false   # boolean — not the string "disabled"
+  upgrade:
+    serverSideApply: disabled  # enum: enabled | disabled | auto
+    force: true
+```
+
+Validate with **`kubectl apply --dry-run=server -f …`** before committing. The **install** and **upgrade** fields use **different schemas**; copying `serverSideApply: disabled` onto **both** can fail validation.
+
+## Helm chart upgrades that change Service/Deployment shape
+
+Charts that **remove sidecars** or **change port lists** (e.g. OpenTelemetry operator **0.109 → 0.110**, kube-rbac-proxy removal) can leave Kubernetes rejecting merged objects (**duplicate port `name`**). Mitigations:
+
+- **`upgrade.force: true`** plus correct **`serverSideApply`** settings (above).
+- If still wedged: **`kubectl delete deployment,svc`** for the release’s manager workload (not CRDs), then **`flux reconcile helmrelease … --force`** so Helm recreates clean resources.
+
+## Grafana / Loki panels on this stack
+
+Log panels that use **LogQL** should not include a no-op **`|= \`\``** (empty line filter) — it can yield **no data** even when logs exist. Prefer `{<label selectors>} | json | …` without stray empty filters.
 
 ## Inspect status
 ```bash

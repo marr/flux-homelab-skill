@@ -41,3 +41,5 @@ Follow `references/homepage.md`.
 - Some widgets need internal API compatibility flags or version selectors.
 - Some services accept one auth mode in direct tests but require another for homepage widgets.
 - SOPS has no delete-key command; use decrypt-edit-reencrypt.
+- A **stuck `HelmRelease`** under a `Kustomization` with **`spec.wait: true`** blocks **`lastAppliedRevision`** from advancing and freezes **downstream `dependsOn` kustomizations**; **`helm-controller` CPU** can spike from retries. See `references/flux.md` (stuck releases, SSA + `upgrade.force`).
+- **`HelmRelease.spec.install.serverSideApply`** and **`spec.upgrade.serverSideApply`** use **different types** in the Flux API (install: boolean; upgrade: `enabled` / `disabled` / `auto`). Using `disabled` on **install** fails validation. Pair **`upgrade.force: true`** with **`serverSideApply` disabled/false** or Helm may error: *force conflicts and force replace together*.
