@@ -15,18 +15,14 @@ This version is safe to share publicly. It focuses on reusable workflows and got
 - debugging ConfigMap/Secret changes that did not reach running pods
 
 ## Contents
-- `SKILL.md`
-- `references/flux.md`
-- `references/secrets.md`
-- `references/homepage.md`
-- `references/cluster-hygiene.md`
+- `SKILL.md` — self-contained skill with all reference material inlined
 
 ## Install
 Use the packaged `.skill` file from the GitHub release, or clone this repo and package it with your own tooling.
 
 ## Cursor / monorepo layout (optional)
 
-If this repo lives next to `fleet-infra` under a workspace root, you can expose it to Cursor’s agent skills path with a **symlink** so you only edit one tree:
+If this repo lives next to `fleet-infra` under a workspace root, you can expose it to Cursor's agent skills path with a **symlink** so you only edit one tree:
 
 ```bash
 # from <workspace>/.agents/skills — adjust if your layout differs
