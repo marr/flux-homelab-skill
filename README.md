@@ -15,7 +15,8 @@ This version is safe to share publicly. It focuses on reusable workflows and got
 - debugging ConfigMap/Secret changes that did not reach running pods
 
 ## Contents
-- `SKILL.md` — self-contained skill with all reference material inlined
+- `SKILL.md` — lightweight skill definition with reference links
+- `references/` — detailed documentation for Flux, SOPS, Homepage, and cluster hygiene
 
 ## Install
 Use the packaged `.skill` file from the GitHub release, or clone this repo and package it with your own tooling.
