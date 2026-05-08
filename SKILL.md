@@ -34,6 +34,9 @@ See `references/flux.md` for reconciliation commands, stuck kustomizations, Helm
 ### Cluster maintenance
 See `references/cluster-hygiene.md` for endpoint management, orphan services, and noisy log patterns.
 
+### Grafana dashboards
+See `references/grafana-dashboards.md` for custom dashboard patterns and deployment.
+
 ## Quick reference
 
 | Task | Location |
@@ -42,6 +45,7 @@ See `references/cluster-hygiene.md` for endpoint management, orphan services, an
 | SOPS secrets | `references/secrets.md` |
 | Homepage widgets | `references/homepage.md` |
 | Cluster hygiene | `references/cluster-hygiene.md` |
+| Grafana dashboards | `references/grafana-dashboards.md` |
 
 ---
 
